@@ -28,8 +28,8 @@ app.use('/images', express.static('public/images'));
 const db = mysql.createConnection({
   host: 'localhost',
   user: 'root',
-  password: 'password',
-  database: 'database'
+  password: '#JJeusebio678213',
+  database: 'flutterdb'
 });
 
 
@@ -122,40 +122,49 @@ app.get('/products', (req, res) => {
 // UPDATE PRODUCT
 // =======================
 app.put('/products/:id', (req, res) => {
-  const { name, price } = req.body;
   const id = req.params.id;
+  const contentType = req.headers['content-type'] || '';
 
+  if (contentType.includes('multipart/form-data')) {
+    upload.single('image')(req, res, (err) => {
+      if (err) return res.status(500).json({ error: err.message });
 
-  const sql = 'UPDATE products SET name=?, price=? WHERE id=?';
+      console.log('BODY:', req.body);
+      console.log('FILE:', req.file);
 
-
-  db.query(sql, [name, price, id], (err, result) => {
-    if (err) return res.status(500).json(err);
-
-
-    res.json({ message: 'Product updated' });
-  });
+      const { name, price } = req.body;
+      const image = req.file.filename;
+      const sql = 'UPDATE products SET name=?, price=?, image_url=? WHERE id=?';
+      db.query(sql, [name, price, image, id], (dbErr) => {
+        if (dbErr) return res.status(500).json(dbErr);
+        res.json({ message: 'Product updated' });
+      });
+    });
+  } else {
+    const { name, price } = req.body;
+    const sql = 'UPDATE products SET name=?, price=? WHERE id=?';
+    db.query(sql, [name, price, id], (dbErr) => {
+      if (dbErr) return res.status(500).json(dbErr);
+      res.json({ message: 'Product updated' });
+    });
+  }
 });
 
-
-// =======================
-// DELETE PRODUCT
-// =======================
 app.delete('/products/:id', (req, res) => {
   const id = req.params.id;
-
+  console.log('DELETE id:', id);
 
   const sql = 'DELETE FROM products WHERE id=?';
 
-
   db.query(sql, [id], (err, result) => {
-    if (err) return res.status(500).json(err);
-
-
+    if (err) {
+      console.log('DELETE ERROR:', err);
+      return res.status(500).json(err);
+    }
+    console.log('DELETE RESULT:', result);
     res.json({ message: 'Product deleted' });
   });
 });
-
 
 // =======================
 // START SERVER
