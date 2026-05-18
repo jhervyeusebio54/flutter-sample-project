@@ -36,13 +36,13 @@ class _EditProductPageState extends State<EditProductPage> {
   }
 
   Future<void> pickImage() async {
-    final picked =
-        await picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
-    if (picked != null) {
-      final bytes = await picked.readAsBytes();
-      setState(() => newImage = bytes);
-    }
+  final picked =
+      await picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
+  if (picked != null && mounted) {
+    final bytes = await picked.readAsBytes();
+    if (mounted) setState(() => newImage = bytes);
   }
+}
 
   Future<void> updateProduct() async {
     if (nameController.text.trim().isEmpty ||

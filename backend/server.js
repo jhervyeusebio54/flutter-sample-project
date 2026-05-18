@@ -165,7 +165,113 @@ app.delete('/products/:id', (req, res) => {
     res.json({ message: 'Product deleted' });
   });
 });
+// =======================
+// ORDERS
+// =======================
+app.post('/orders', (req, res) => {
+  const { items, total } = req.body;
+  const sql = 'INSERT INTO orders (total, created_at) VALUES (?, NOW())';
 
+  db.query(sql, [total], (err, result) => {
+    if (err) return res.status(500).json(err);
+
+    const orderId = result.insertId;
+    const orderItems = items.map(item => [
+      orderId,
+      item.id,
+      item.name,
+      item.quantity,
+      item.price,
+    ]);
+
+    const itemSql = 'INSERT INTO order_items (order_id, product_id, name, quantity, price) VALUES ?';
+    db.query(itemSql, [orderItems], (err2) => {
+      if (err2) return res.status(500).json(err2);
+      res.json({ message: 'Order placed', orderId });
+    });
+  });
+});
+
+app.get('/orders', (req, res) => {
+  const sql = `
+    SELECT o.id, o.total, o.created_at,
+      JSON_ARRAYAGG(
+        JSON_OBJECT(
+          'product_id', oi.product_id,
+          'name', oi.name,
+          'quantity', oi.quantity,
+          'price', oi.price
+        )
+      ) AS items
+    FROM orders o
+    JOIN order_items oi ON o.id = oi.order_id
+    GROUP BY o.id
+    ORDER BY o.created_at DESC
+  `;
+  db.query(sql, (err, result) => {
+    if (err) return res.status(500).json(err);
+    res.json(result);
+  });
+});
+
+// =======================
+// CART (persist per session key)
+// =======================
+app.post('/cart', (req, res) => {
+  const { session_key, product_id, name, price, quantity } = req.body;
+  const checkSql = 'SELECT * FROM cart WHERE session_key=? AND product_id=?';
+
+  db.query(checkSql, [session_key, product_id], (err, result) => {
+    if (err) return res.status(500).json(err);
+
+    if (result.length > 0) {
+      const updateSql = 'UPDATE cart SET quantity=quantity+? WHERE session_key=? AND product_id=?';
+      db.query(updateSql, [quantity, session_key, product_id], (err2) => {
+        if (err2) return res.status(500).json(err2);
+        res.json({ message: 'Cart updated' });
+      });
+    } else {
+      const insertSql = 'INSERT INTO cart (session_key, product_id, name, price, quantity) VALUES (?,?,?,?,?)';
+      db.query(insertSql, [session_key, product_id, name, price, quantity], (err2) => {
+        if (err2) return res.status(500).json(err2);
+        res.json({ message: 'Added to cart' });
+      });
+    }
+  });
+});
+
+app.get('/cart/:session_key', (req, res) => {
+  const sql = 'SELECT * FROM cart WHERE session_key=?';
+  db.query(sql, [req.params.session_key], (err, result) => {
+    if (err) return res.status(500).json(err);
+    res.json(result);
+  });
+});
+
+app.put('/cart', (req, res) => {
+  const { session_key, product_id, quantity } = req.body;
+  if (quantity <= 0) {
+    const sql = 'DELETE FROM cart WHERE session_key=? AND product_id=?';
+    db.query(sql, [session_key, product_id], (err) => {
+      if (err) return res.status(500).json(err);
+      res.json({ message: 'Item removed' });
+    });
+  } else {
+    const sql = 'UPDATE cart SET quantity=? WHERE session_key=? AND product_id=?';
+    db.query(sql, [quantity, session_key, product_id], (err) => {
+      if (err) return res.status(500).json(err);
+      res.json({ message: 'Cart updated' });
+    });
+  }
+});
+
+app.delete('/cart/:session_key', (req, res) => {
+  const sql = 'DELETE FROM cart WHERE session_key=?';
+  db.query(sql, [req.params.session_key], (err) => {
+    if (err) return res.status(500).json(err);
+    res.json({ message: 'Cart cleared' });
+  });
+});
 // =======================
 // START SERVER
 // =======================
