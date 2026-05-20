@@ -90,7 +90,6 @@ class _LoginPageState extends State<LoginPage>
   final _passCtrl = TextEditingController();
 
   // Sign Up
-  final _suNameCtrl = TextEditingController();
   final _suEmailCtrl = TextEditingController();
   final _suPassCtrl = TextEditingController();
   final _suConfirmCtrl = TextEditingController();
@@ -104,8 +103,6 @@ class _LoginPageState extends State<LoginPage>
 
   late AnimationController _bgCtrl;
   late AnimationController _slideCtrl;
-  late Animation<double> _slideAnim;
-  late Animation<double> _fadeAnim;
 
   final String _baseUrl = 'http://localhost:3000';
 
@@ -117,10 +114,6 @@ class _LoginPageState extends State<LoginPage>
       ..repeat();
     _slideCtrl = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 420));
-    _slideAnim = CurvedAnimation(
-        parent: _slideCtrl, curve: Curves.easeInOutCubic);
-    _fadeAnim = CurvedAnimation(
-        parent: _slideCtrl, curve: Curves.easeOut);
   }
 
   @override
@@ -129,7 +122,6 @@ class _LoginPageState extends State<LoginPage>
     _slideCtrl.dispose();
     _emailCtrl.dispose();
     _passCtrl.dispose();
-    _suNameCtrl.dispose();
     _suEmailCtrl.dispose();
     _suPassCtrl.dispose();
     _suConfirmCtrl.dispose();
@@ -185,8 +177,7 @@ class _LoginPageState extends State<LoginPage>
   }
 
   Future<void> _signup() async {
-    if (_suNameCtrl.text.trim().isEmpty ||
-        _suEmailCtrl.text.trim().isEmpty ||
+    if (_suEmailCtrl.text.trim().isEmpty ||
         _suPassCtrl.text.isEmpty ||
         _suConfirmCtrl.text.isEmpty) {
       setState(() => _errorMsg = 'Please fill in all fields.');
@@ -206,7 +197,6 @@ class _LoginPageState extends State<LoginPage>
         Uri.parse('$_baseUrl/register'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
-          'name': _suNameCtrl.text.trim(),
           'email': _suEmailCtrl.text.trim(),
           'password': _suPassCtrl.text,
         }),
@@ -380,12 +370,6 @@ class _LoginPageState extends State<LoginPage>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _buildField(
-          ctrl: _suNameCtrl,
-          hint: 'Full name',
-          icon: Icons.person_outline_rounded,
-        ),
-        const SizedBox(height: 12),
         _buildField(
           ctrl: _suEmailCtrl,
           hint: 'Email address',
