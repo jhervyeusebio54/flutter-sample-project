@@ -239,6 +239,14 @@ app.post('/cart', (req, res) => {
     }
   });
 });
+app.post('/register', (req, res) => {
+  const { name, email, password } = req.body;
+  const sql = 'INSERT INTO users (name, email, password) VALUES (?, ?, ?)';
+  db.query(sql, [name, email, password], (err, result) => {
+    if (err) return res.status(500).json({ message: 'Email already exists or server error.' });
+    res.json({ message: 'Account created' });
+  });
+});
 
 app.get('/cart/:session_key', (req, res) => {
   const sql = 'SELECT * FROM cart WHERE session_key=?';
