@@ -191,87 +191,89 @@ class _ProductListPageState extends State<ProductListPage> {
   }
 
   void _showSortSheet(BuildContext context) {
-  showModalBottomSheet(
-    context: context,
-    backgroundColor: const Color(0xFF1E1E2E),
-    isScrollControlled: true,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-    ),
-    builder: (_) {
-      final options = [
-        (SortOption.newest, Icons.schedule_rounded, 'Newest first'),
-        (SortOption.oldest, Icons.history_rounded, 'Oldest first'),
-        (SortOption.nameAsc, Icons.sort_by_alpha_rounded, 'Name A → Z'),
-        (SortOption.nameDesc, Icons.sort_by_alpha_rounded, 'Name Z → A'),
-        (SortOption.priceAsc, Icons.arrow_upward_rounded, 'Price low → high'),
-        (SortOption.priceDesc, Icons.arrow_downward_rounded, 'Price high → low'),
-      ];
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF1E1E2E),
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) {
+        final options = [
+          (SortOption.newest, Icons.schedule_rounded, 'Newest first'),
+          (SortOption.oldest, Icons.history_rounded, 'Oldest first'),
+          (SortOption.nameAsc, Icons.sort_by_alpha_rounded, 'Name A → Z'),
+          (SortOption.nameDesc, Icons.sort_by_alpha_rounded, 'Name Z → A'),
+          (SortOption.priceAsc, Icons.arrow_upward_rounded, 'Price low → high'),
+          (SortOption.priceDesc, Icons.arrow_downward_rounded, 'Price high → low'),
+        ];
 
-      return SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.fromLTRB(
-            16,
-            12,
-            16,
-            MediaQuery.of(context).viewInsets.bottom + 16,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Container(
-                  width: 36,
-                  height: 4,
-                  margin: const EdgeInsets.only(bottom: 16),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF9090A8),
-                    borderRadius: BorderRadius.circular(2),
+        return SafeArea(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.fromLTRB(
+              16,
+              12,
+              16,
+              MediaQuery.of(context).viewInsets.bottom + 16,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 36,
+                    height: 4,
+                    margin: const EdgeInsets.only(bottom: 16),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF9090A8),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
                   ),
                 ),
-              ),
-              const Text('Sort by',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600)),
-              const SizedBox(height: 8),
-              ...options.map((o) {
-                final isSelected = currentSort == o.$1;
-                return ListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 4),
-                  leading: Icon(o.$2,
-                      color: isSelected
-                          ? const Color(0xFF6C63FF)
-                          : const Color(0xFF9090A8),
-                      size: 20),
-                  title: Text(o.$3,
-                      style: TextStyle(
-                          color: isSelected
-                              ? const Color(0xFF6C63FF)
-                              : Colors.white,
-                          fontSize: 14,
-                          fontWeight: isSelected
-                              ? FontWeight.w600
-                              : FontWeight.normal)),
-                  trailing: isSelected
-                      ? const Icon(Icons.check_rounded,
-                          color: Color(0xFF6C63FF), size: 18)
-                      : null,
-                  onTap: () {
-                    Navigator.pop(context);
-                    _onSortChanged(o.$1);
-                  },
-                );
-              }),
-            ],
+                const Text('Sort by',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600)),
+                const SizedBox(height: 8),
+                ...options.map((o) {
+                  final isSelected = currentSort == o.$1;
+                  return ListTile(
+                    contentPadding:
+                        const EdgeInsets.symmetric(horizontal: 4),
+                    leading: Icon(o.$2,
+                        color: isSelected
+                            ? const Color(0xFF6C63FF)
+                            : const Color(0xFF9090A8),
+                        size: 20),
+                    title: Text(o.$3,
+                        style: TextStyle(
+                            color: isSelected
+                                ? const Color(0xFF6C63FF)
+                                : Colors.white,
+                            fontSize: 14,
+                            fontWeight: isSelected
+                                ? FontWeight.w600
+                                : FontWeight.normal)),
+                    trailing: isSelected
+                        ? const Icon(Icons.check_rounded,
+                            color: Color(0xFF6C63FF), size: 18)
+                        : null,
+                    onTap: () {
+                      Navigator.pop(context);
+                      _onSortChanged(o.$1);
+                    },
+                  );
+                }),
+              ],
+            ),
           ),
-        ),
-      );
-    },
-  );
-}
+        );
+      },
+    );
+  }
+
   String _sortLabel() {
     switch (currentSort) {
       case SortOption.nameAsc:
@@ -294,6 +296,107 @@ class _ProductListPageState extends State<ProductListPage> {
     return '$baseUrl/images/$image';
   }
 
+  Widget _buildProductCard(Map p) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1E1E2E),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        child: Row(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: Image.network(
+                getImageUrl(p['image_url']),
+                width: 56,
+                height: 56,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => Container(
+                  width: 56,
+                  height: 56,
+                  color: const Color(0xFF2A2A3E),
+                  child: const Icon(Icons.image_outlined,
+                      color: Color(0xFF9090A8)),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    p['name'] ?? '',
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 15),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '₱${p['price']}',
+                    style: const TextStyle(
+                        color: Color(0xFF6C63FF),
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14),
+                  ),
+                ],
+              ),
+            ),
+            // Action buttons
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _iconBtn(
+                  icon: Icons.edit_outlined,
+                  color: const Color(0xFF9090A8),
+                  onTap: () async {
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => EditProductPage(product: p)),
+                    );
+                    if (result == true) fetchProducts();
+                  },
+                ),
+                const SizedBox(width: 4),
+                _iconBtn(
+                  icon: Icons.delete_outline_rounded,
+                  color: Colors.red.shade400,
+                  onTap: () => _confirmDelete(context, p),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _iconBtn({
+    required IconData icon,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 36,
+        height: 36,
+        decoration: BoxDecoration(
+          color: const Color(0xFF2A2A3E),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Icon(icon, color: color, size: 18),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final bottomPadding = MediaQuery.of(context).padding.bottom;
@@ -302,32 +405,32 @@ class _ProductListPageState extends State<ProductListPage> {
       appBar: AppBar(
         title: const Text('Inventory'),
         actions: [
-      IconButton(
-        icon: const Icon(Icons.storefront_outlined, color: Color(0xFF6C63FF)),
-        tooltip: 'Customer view',
-        onPressed: () {
-          showDialog(
-            context: context,
-            builder: (_) => CustomerModal(products: products),
-          );
-        },
-      ),
-      IconButton(
-        icon: const Icon(Icons.logout_rounded, color: Color(0xFF9090A8)),
-        tooltip: 'Log out',
-        onPressed: () => _confirmLogout(context),
-      ),
-      const SizedBox(width: 4),
-    ],
+          IconButton(
+            icon: const Icon(Icons.storefront_outlined,
+                color: Color(0xFF6C63FF)),
+            tooltip: 'Customer view',
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (_) => CustomerModal(products: products),
+              );
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.logout_rounded,
+                color: Color(0xFF9090A8)),
+            tooltip: 'Log out',
+            onPressed: () => _confirmLogout(context),
+          ),
+          const SizedBox(width: 4),
+        ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         icon: const Icon(Icons.add_rounded),
         label: const Text('Add Product'),
         onPressed: () async {
-          await Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (_) => const AddProductPage()));
+          await Navigator.push(context,
+              MaterialPageRoute(builder: (_) => const AddProductPage()));
           fetchProducts();
         },
       ),
@@ -434,95 +537,17 @@ class _ProductListPageState extends State<ProductListPage> {
                                   ? 'No products match your search'
                                   : 'No products yet',
                               style: const TextStyle(
-                                  color: Color(0xFF9090A8),
-                                  fontSize: 15),
+                                  color: Color(0xFF9090A8), fontSize: 15),
                             ),
                           ],
                         ),
                       )
                     : ListView.builder(
-                        // accounts for FAB + system nav bar height
                         padding: EdgeInsets.fromLTRB(
                             16, 4, 16, 80 + bottomPadding),
                         itemCount: filteredProducts.length,
-                        itemBuilder: (context, index) {
-                          final p = filteredProducts[index];
-                          return Container(
-                            margin: const EdgeInsets.only(bottom: 10),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF1E1E2E),
-                              borderRadius: BorderRadius.circular(14),
-                            ),
-                            child: ListTile(
-                              contentPadding:
-                                  const EdgeInsets.symmetric(
-                                      horizontal: 14, vertical: 8),
-                              leading: ClipRRect(
-                                borderRadius: BorderRadius.circular(10),
-                                child: Image.network(
-                                  getImageUrl(p['image_url']),
-                                  width: 56,
-                                  height: 56,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (_, __, ___) => Container(
-                                    width: 56,
-                                    height: 56,
-                                    color: const Color(0xFF2A2A3E),
-                                    child: const Icon(
-                                        Icons.image_outlined,
-                                        color: Color(0xFF9090A8)),
-                                  ),
-                                ),
-                              ),
-                              title: Text(
-                                p['name'] ?? '',
-                                style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 15),
-                              ),
-                              subtitle: Padding(
-                                padding: const EdgeInsets.only(top: 4),
-                                child: Text(
-                                  '₱${p['price']}',
-                                  style: const TextStyle(
-                                      color: Color(0xFF6C63FF),
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 14),
-                                ),
-                              ),
-                              trailing: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  IconButton(
-                                    icon: const Icon(Icons.edit_outlined,
-                                        color: Color(0xFF9090A8),
-                                        size: 20),
-                                    onPressed: () async {
-                                      final result =
-                                          await Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (_) =>
-                                                EditProductPage(
-                                                    product: p)),
-                                      );
-                                      if (result == true) fetchProducts();
-                                    },
-                                  ),
-                                  IconButton(
-                                    icon: Icon(
-                                        Icons.delete_outline_rounded,
-                                        color: Colors.red.shade400,
-                                        size: 20),
-                                    onPressed: () =>
-                                        _confirmDelete(context, p),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
+                        itemBuilder: (context, index) =>
+                            _buildProductCard(filteredProducts[index]),
                       ),
           ),
         ],

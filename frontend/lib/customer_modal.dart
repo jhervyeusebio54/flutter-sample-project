@@ -263,7 +263,6 @@ class _CustomerModalState extends State<CustomerModal>
         height: MediaQuery.of(context).size.height * 0.85,
         child: Column(
           children: [
-            // Header
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 20, 12, 0),
               child: Row(
@@ -286,7 +285,6 @@ class _CustomerModalState extends State<CustomerModal>
               ),
             ),
 
-            // Tabs
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
               child: Container(
@@ -342,12 +340,10 @@ class _CustomerModalState extends State<CustomerModal>
 
             const SizedBox(height: 8),
 
-            // Tab views
             Expanded(
               child: TabBarView(
                 controller: _tabController,
                 children: [
-                  // Products tab
                   widget.products.isEmpty
                       ? const Center(
                           child: Text('No products available',
@@ -467,7 +463,6 @@ class _CustomerModalState extends State<CustomerModal>
                           },
                         ),
 
-                  // Cart tab
                   isLoadingCart
                       ? const Center(
                           child: CircularProgressIndicator(
@@ -581,7 +576,6 @@ class _CustomerModalState extends State<CustomerModal>
                                   ),
                                 ),
 
-                                // Checkout bar
                                 Container(
                                   padding: const EdgeInsets.all(16),
                                   decoration: const BoxDecoration(

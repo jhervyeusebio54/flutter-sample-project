@@ -10,9 +10,7 @@ const app = express();
 const PORT = 3000;
 
 
-// =======================
 // MIDDLEWARE
-// =======================
 app.use(cors());
 app.use(bodyParser.json());
 app.use(express.json());
@@ -22,9 +20,7 @@ app.use(express.json());
 app.use('/images', express.static('public/images'));
 
 
-// =======================
 // MYSQL CONNECTION
-// =======================
 const db = mysql.createConnection({
   host: 'localhost',
   user: 'root',
@@ -39,9 +35,7 @@ db.connect(err => {
 });
 
 
-// =======================
 // MULTER (IMAGE UPLOAD)
-// =======================
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, 'public/images');
@@ -56,9 +50,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 
-// =======================
 // LOGIN API
-// =======================
 app.post('/login', (req, res) => {
   const { email, password } = req.body;
 
@@ -79,9 +71,7 @@ app.post('/login', (req, res) => {
 });
 
 
-// =======================
-// CREATE PRODUCT
-// =======================
+
 app.post('/products', upload.single('image'), (req, res) => {
   const { name, price } = req.body;
   const image = req.file ? req.file.filename : '';
@@ -102,9 +92,7 @@ app.post('/products', upload.single('image'), (req, res) => {
 });
 
 
-// =======================
-// READ PRODUCTS
-// =======================
+
 app.get('/products', (req, res) => {
   const sql = 'SELECT * FROM products';
 
@@ -118,9 +106,7 @@ app.get('/products', (req, res) => {
 });
 
 
-// =======================
-// UPDATE PRODUCT
-// =======================
+
 app.put('/products/:id', (req, res) => {
   const id = req.params.id;
   const contentType = req.headers['content-type'] || '';
@@ -165,9 +151,7 @@ app.delete('/products/:id', (req, res) => {
     res.json({ message: 'Product deleted' });
   });
 });
-// =======================
-// ORDERS
-// =======================
+
 app.post('/orders', (req, res) => {
   const { items, total } = req.body;
   const sql = 'INSERT INTO orders (total, created_at) VALUES (?, NOW())';
@@ -214,9 +198,7 @@ app.get('/orders', (req, res) => {
   });
 });
 
-// =======================
-// CART (persist per session key)
-// =======================
+
 app.post('/cart', (req, res) => {
   const { session_key, product_id, name, price, quantity } = req.body;
   const checkSql = 'SELECT * FROM cart WHERE session_key=? AND product_id=?';
@@ -281,9 +263,7 @@ app.delete('/cart/:session_key', (req, res) => {
     res.json({ message: 'Cart cleared' });
   });
 });
-// =======================
-// START SERVER
-// =======================
+
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
